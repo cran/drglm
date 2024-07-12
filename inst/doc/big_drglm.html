@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Fitting Linear and Generalized Linear Models to out of the memory data sets in Divide and Recombine approach</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Fitting Linear and Generalized Linear
+Models to out of the memory data sets in Divide and Recombine
+approach</h1>
+
+
+
+<p>To fit Generalized Linear Models (GLMs) on large data sets that
+exceed memory limits, you can use the ‘big.drglm’ function. The ‘biglm’
+package has been used for such applications, but it doesn’t support
+factors. The ‘speedglm’ package does support factors, but its
+application on large CSV files for fitting GLMs hasn’t been
+demonstrated. We’ll show how to fit large datasets in chunks for model
+fitting.</p>
+<p>Now , lets create a toy data set</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co">#Number of rows to be generated</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">1000000</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#creating dataset</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( </span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="at">Var_1 =</span> <span class="fu">round</span>(<span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">50</span>, <span class="at">sd =</span> <span class="dv">10</span>)), </span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="at">Var_2 =</span> <span class="fu">round</span>(<span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="fl">7.5</span>, <span class="at">sd =</span> <span class="fl">2.1</span>)), </span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="at">Var_3 =</span> <span class="fu">as.factor</span>(<span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&quot;0&quot;</span>, <span class="st">&quot;1&quot;</span>), n, <span class="at">replace =</span> <span class="cn">TRUE</span>)), </span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="at">Var_4 =</span> <span class="fu">as.factor</span>(<span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&quot;0&quot;</span>, <span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>), n, <span class="at">replace =</span> <span class="cn">TRUE</span>)), </span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="at">Var_5 =</span> <span class="fu">as.factor</span>(<span class="fu">sample</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">15</span>, n, <span class="at">replace =</span> <span class="cn">TRUE</span>)), </span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="at">Var_6 =</span> <span class="fu">round</span>(<span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">60</span>, <span class="at">sd =</span> <span class="dv">5</span>))</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>)</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co"># Save the dataset to a temporary file</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>temp_file <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.csv&quot;</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="fu">write.csv</span>(dataset, <span class="at">file =</span> temp_file, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co"># Path to the temporary file</span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>dataset_path <span class="ot">&lt;-</span> temp_file</span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>dataset_path  <span class="co"># Display the path to the temporary file</span></span></code></pre></div>
+<pre><code>## [1] &quot;C:\\Users\\mhnay\\AppData\\Local\\Temp\\Rtmp2JrL98\\file681c218a3e50.csv&quot;</code></pre>
+<p>We’ve saved the data set to disk, assuming the data set is too large
+to fit into memory. We’ll explore how to handle such data sets. The
+‘drglm’ package offers a function called ‘make.data’, which is a slight
+modification of the ‘biglm’ and ‘speedglm’ packages. It’s specifically
+designed for large CSV files that can’t be loaded into memory.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Path to the temporary file</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>dataset_path <span class="ot">&lt;-</span> temp_file</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>dataset_path  <span class="co"># Display the path to the temporary file</span></span></code></pre></div>
+<pre><code>## [1] &quot;C:\\Users\\mhnay\\AppData\\Local\\Temp\\Rtmp2JrL98\\file681c218a3e50.csv&quot;</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Initialize the data reading function with the data set path and chunk size</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>da <span class="ot">&lt;-</span> drglm<span class="sc">::</span><span class="fu">make.data</span>(dataset_path, <span class="at">chunksize =</span> <span class="dv">100000</span>)</span></code></pre></div>
+<div id="fitting-mlr-models" class="section level1">
+<h1>Fitting MLR Models</h1>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Fitting MLR Model</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>nmodel <span class="ot">&lt;-</span> </span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  drglm<span class="sc">::</span><span class="fu">big.drglm</span>(da, <span class="at">formula =</span> Var_1 <span class="sc">~</span> Var_2<span class="sc">+</span> <span class="fu">factor</span>(Var_3)<span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>                     <span class="fu">factor</span>(Var_4)<span class="sc">+</span> <span class="fu">factor</span>(Var_5)<span class="sc">+</span> Var_6, <span class="dv">10</span>, <span class="at">family=</span><span class="st">&quot;gaussian&quot;</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co"># View the results table</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="fu">print</span>(nmodel)</span></code></pre></div>
+<pre><code>##                      Estimate standard.error      t_value  Pr...z..
+## (Intercept)     49.9938921629    0.132222414 378.10451704 0.0000000
+## Var_2           -0.0045648136    0.004721587  -0.96679652 0.3336458
+## factor(Var_3)1   0.0140777358    0.020007935   0.70360764 0.4816772
+## factor(Var_4)1  -0.0070996373    0.024495862  -0.28983006 0.7719462
+## factor(Var_4)2   0.0031706649    0.024509469   0.12936490 0.8970689
+## factor(Var_5)1  -0.0572865412    0.056620740  -1.01175896 0.3116533
+## factor(Var_5)2  -0.0110496857    0.056615948  -0.19516914 0.8452605
+## factor(Var_5)3  -0.0448607620    0.056694044  -0.79127821 0.4287817
+## factor(Var_5)4  -0.0268086198    0.056646008  -0.47326582 0.6360235
+## factor(Var_5)5   0.0466234380    0.056633526   0.82324801 0.4103670
+## factor(Var_5)6  -0.0270480470    0.056580123  -0.47804857 0.6326156
+## factor(Var_5)7   0.0433609651    0.056668648   0.76516675 0.4441723
+## factor(Var_5)8  -0.0297390739    0.056712763  -0.52438062 0.6000138
+## factor(Var_5)9   0.0432931453    0.056669237   0.76396203 0.4448899
+## factor(Var_5)10  0.0672852618    0.056660012   1.18752643 0.2350200
+## factor(Var_5)11 -0.0583903308    0.056635285  -1.03098856 0.3025462
+## factor(Var_5)12  0.0091184125    0.056623543   0.16103571 0.8720653
+## factor(Var_5)13  0.0049039721    0.056698929   0.08649144 0.9310758
+## factor(Var_5)14 -0.0151239426    0.056584592  -0.26728023 0.7892534
+## factor(Var_5)15  0.0548865463    0.056635643   0.96911668 0.3324870
+## Var_6            0.0004866552    0.001996329   0.24377510 0.8074050
+##                         normal.CI
+## (Intercept)     [ 49.73 , 50.25 ]
+## Var_2               [ -0.01 , 0 ]
+## factor(Var_3)1   [ -0.03 , 0.05 ]
+## factor(Var_4)1   [ -0.06 , 0.04 ]
+## factor(Var_4)2   [ -0.04 , 0.05 ]
+## factor(Var_5)1   [ -0.17 , 0.05 ]
+## factor(Var_5)2    [ -0.12 , 0.1 ]
+## factor(Var_5)3   [ -0.16 , 0.07 ]
+## factor(Var_5)4   [ -0.14 , 0.08 ]
+## factor(Var_5)5   [ -0.06 , 0.16 ]
+## factor(Var_5)6   [ -0.14 , 0.08 ]
+## factor(Var_5)7   [ -0.07 , 0.15 ]
+## factor(Var_5)8   [ -0.14 , 0.08 ]
+## factor(Var_5)9   [ -0.07 , 0.15 ]
+## factor(Var_5)10  [ -0.04 , 0.18 ]
+## factor(Var_5)11  [ -0.17 , 0.05 ]
+## factor(Var_5)12   [ -0.1 , 0.12 ]
+## factor(Var_5)13  [ -0.11 , 0.12 ]
+## factor(Var_5)14   [ -0.13 , 0.1 ]
+## factor(Var_5)15  [ -0.06 , 0.17 ]
+## Var_6                   [ 0 , 0 ]</code></pre>
+<p>In this similar manner , we can fit other family models using the
+above data set.</p>
+</div>
+<div id="fitting-logistic-regression-model" class="section level1">
+<h1>Fitting logistic Regression Model</h1>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Fitting Logistic Model</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>bmodel <span class="ot">&lt;-</span> drglm<span class="sc">::</span><span class="fu">big.drglm</span>(da,<span class="at">formula =</span> <span class="fu">factor</span>(Var_3) <span class="sc">~</span> Var_1<span class="sc">+</span> Var_2<span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>                             <span class="fu">factor</span>(Var_4)<span class="sc">+</span> <span class="fu">factor</span>(Var_5)<span class="sc">+</span> Var_6, </span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>                           <span class="dv">10</span>, <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co"># View the results table</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="fu">print</span>(bmodel)</span></code></pre></div>
+<pre><code>##                      Estimate Odds.Ratio standard.error    t.value   Pr...z..
+## (Intercept)      0.0498850493  1.0511503   0.0281923787  1.7694516 0.07681854
+## Var_1            0.0001406428  1.0001407   0.0001999858  0.7032641 0.48189121
+## Var_2           -0.0010289335  0.9989716   0.0009441471 -1.0898021 0.27580035
+## factor(Var_4)1  -0.0009157951  0.9990846   0.0048982015 -0.1869656 0.85168762
+## factor(Var_4)2   0.0008660010  1.0008664   0.0049009500  0.1767006 0.85974354
+## factor(Var_5)1  -0.0090198819  0.9910207   0.0113218905 -0.7966763 0.42563905
+## factor(Var_5)2  -0.0103609021  0.9896926   0.0113209121 -0.9152003 0.36008649
+## factor(Var_5)3  -0.0111773346  0.9888849   0.0113364057 -0.9859681 0.32414876
+## factor(Var_5)4  -0.0051583819  0.9948549   0.0113269975 -0.4554059 0.64881723
+## factor(Var_5)5  -0.0166414412  0.9834963   0.0113247263 -1.4694784 0.14170306
+## factor(Var_5)6  -0.0170752441  0.9830697   0.0113137869 -1.5092422 0.13123691
+## factor(Var_5)7  -0.0115591956  0.9885074   0.0113313552 -1.0201071 0.30767768
+## factor(Var_5)8  -0.0190175646  0.9811621   0.0113399851 -1.6770361 0.09353542
+## factor(Var_5)9  -0.0024879742  0.9975151   0.0113313423 -0.2195657 0.82620940
+## factor(Var_5)10 -0.0039725724  0.9960353   0.0113297226 -0.3506328 0.72586385
+## factor(Var_5)11 -0.0189525009  0.9812260   0.0113250085 -1.6735088 0.09422718
+## factor(Var_5)12 -0.0080661323  0.9919663   0.0113222078 -0.7124169 0.47620665
+## factor(Var_5)13 -0.0167293199  0.9834098   0.0113376220 -1.4755581 0.14006256
+## factor(Var_5)14 -0.0270868122  0.9732767   0.0113146115 -2.3939675 0.01666723
+## factor(Var_5)15 -0.0148850714  0.9852252   0.0113248937 -1.3143674 0.18872258
+## Var_6           -0.0006315246  0.9993687   0.0003991918 -1.5820079 0.11364778
+##                        normal.CI
+## (Intercept)     [ -0.01 , 0.11 ]
+## Var_1                  [ 0 , 0 ]
+## Var_2                  [ 0 , 0 ]
+## factor(Var_4)1  [ -0.01 , 0.01 ]
+## factor(Var_4)2  [ -0.01 , 0.01 ]
+## factor(Var_5)1  [ -0.03 , 0.01 ]
+## factor(Var_5)2  [ -0.03 , 0.01 ]
+## factor(Var_5)3  [ -0.03 , 0.01 ]
+## factor(Var_5)4  [ -0.03 , 0.02 ]
+## factor(Var_5)5  [ -0.04 , 0.01 ]
+## factor(Var_5)6  [ -0.04 , 0.01 ]
+## factor(Var_5)7  [ -0.03 , 0.01 ]
+## factor(Var_5)8     [ -0.04 , 0 ]
+## factor(Var_5)9  [ -0.02 , 0.02 ]
+## factor(Var_5)10 [ -0.03 , 0.02 ]
+## factor(Var_5)11    [ -0.04 , 0 ]
+## factor(Var_5)12 [ -0.03 , 0.01 ]
+## factor(Var_5)13 [ -0.04 , 0.01 ]
+## factor(Var_5)14    [ -0.05 , 0 ]
+## factor(Var_5)15 [ -0.04 , 0.01 ]
+## Var_6                  [ 0 , 0 ]</code></pre>
+</div>
+<div id="fitting-poisson-regression-model" class="section level1">
+<h1>Fitting Poisson Regression Model</h1>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Fitting Poisson Regression Model</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>pmodel <span class="ot">&lt;-</span> drglm<span class="sc">::</span><span class="fu">big.drglm</span>(da,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>                           <span class="at">formula =</span> Var_5 <span class="sc">~</span> Var_1<span class="sc">+</span> Var_2<span class="sc">+</span> <span class="fu">factor</span>(Var_3)<span class="sc">+</span> </span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>                             <span class="fu">factor</span>(Var_4)<span class="sc">+</span> Var_6, <span class="dv">10</span>, <span class="at">family=</span><span class="st">&quot;poisson&quot;</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co"># View the results table</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="fu">print</span>(pmodel)</span></code></pre></div>
+<pre><code>##                     Estimate Odds.Ratio standard.error       Z_value   Pr...z..
+## (Intercept)     1.993906e+00  7.3441637              1  1.993906e+00 0.04616233
+## Var_1           8.520103e-05  1.0000852              1  8.520103e-05 0.99993202
+## Var_2           5.068223e-04  1.0005070              1  5.068223e-04 0.99959561
+## factor(Var_3)1 -2.064546e-03  0.9979376              1 -2.064546e-03 0.99835273
+## factor(Var_4)1 -2.984466e-03  0.9970200              1 -2.984466e-03 0.99761874
+## factor(Var_4)2 -2.436860e-03  0.9975661              1 -2.436860e-03 0.99805567
+## Var_6           2.669898e-04  1.0002670              1  2.669898e-04 0.99978697
+##                       normal.CI
+## (Intercept)     [ 0.03 , 3.95 ]
+## Var_1          [ -1.96 , 1.96 ]
+## Var_2          [ -1.96 , 1.96 ]
+## factor(Var_3)1 [ -1.96 , 1.96 ]
+## factor(Var_4)1 [ -1.96 , 1.96 ]
+## factor(Var_4)2 [ -1.96 , 1.96 ]
+## Var_6          [ -1.96 , 1.96 ]</code></pre>
+<p>This package currently allows for fitting GLMs to very large data
+sets in CSV format. Future updates will enable users to fit GLMs to data
+sets in other formats.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+---
+title: "Introduction to 'drglm'"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to Package drglm}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+Package 'drglm' provide users to fit GLMs to big data sets which can be attached into memory. This package uses popular "Divide and Recombine" method to fit GLMs to large data sets. 
+Lets generate a data set which is not that big but serves our purpose. 
+
+```{r setup, include=FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+```
+
+# Generating a Data Set
+
+```{r}
+set.seed(123)
+#Number of rows to be generated
+n <- 1000000
+#creating dataset
+dataset <- data.frame( 
+Var_1 = round(rnorm(n, mean = 50, sd = 10)), 
+Var_2 = round(rnorm(n, mean = 7.5, sd = 2.1)), 
+Var_3 = as.factor(sample(c("0", "1"), n, replace = TRUE)), 
+Var_4 = as.factor(sample(c("0", "1", "2"), n, replace = TRUE)), 
+Var_5 = as.factor(sample(0:15, n, replace = TRUE)), 
+Var_6 = round(rnorm(n, mean = 60, sd = 5))
+)
+
+```
+This data set contains six variables of which four of them are continuous generated from normal distribution and two of them are catagorial and other one is count variable. Now we shall fit different GLMs with this data set below. 
+
+# Fitting Multiple Linear Regression Model
+
+Now, we shall fit multiple linear regression model to the data sets assuming Var_1 as response variable and all other variables as independent ones. 
+
+```{r}
+
+nmodel= drglm::drglm(Var_1 ~ Var_2+ Var_3+ Var_4+ Var_5+ Var_6,  
+                     data=dataset, family="gaussian", 
+                     fitfunction="speedglm", k=10)
+#Output
+print(nmodel)
+```
+
+# Fitting Binomial Regression (Logistic Regression) Model
+
+Now, we shall fit logistic regression model to the data sets assuming Var_3 as response variable and all other variables as independent ones. 
+
+```{r}
+
+bmodel=drglm::drglm(Var_3~ Var_1+ Var_2+ Var_4+ Var_5+ Var_6, 
+                    data=dataset, family="binomial",
+                    fitfunction="speedglm", k=10)
+#Output
+
+print(bmodel)
+```
+
+# Fitting Poisson Regression Model
+
+Now, we shall fit poisson regression model to the data sets assuming Var_5 as response variable and all other variables as independent ones. 
+
+```{r}
+
+pmodel=drglm::drglm(Var_5~ Var_1+ Var_2+ Var_3+ Var_4+ Var_6, 
+                    data=dataset, family="binomial", 
+                    fitfunction="speedglm", k=10)
+
+#Output
+print(pmodel)
+```
+# Fitting Multinomial Logistic Regression Model
+
+Now, we shall fit multinomial logistic regression model to the data sets assuming Var_4 as response variable and all other variables as independent ones. 
+
+```{r}
+
+mmodel=drglm::drglm(Var_4~ Var_1+ Var_2+ Var_3+ Var_5+ Var_6, 
+              data=dataset,family="multinomial",
+              fitfunction="multinom", k=10)
+#Output
+print(mmodel)
+```
+
+Note that, function 'drglm' is designed for fitting GLMs to data sets which can be fitted into memory. To fit data set that is larger than the memory, function 'big.drglm' can be used. Users are requested to check the respective vignette. 

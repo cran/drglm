@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Introduction to ‘drglm’</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Introduction to ‘drglm’</h1>
+
+
+
+<p>Package ‘drglm’ provide users to fit GLMs to big data sets which can
+be attached into memory. This package uses popular “Divide and
+Recombine” method to fit GLMs to large data sets. Lets generate a data
+set which is not that big but serves our purpose.</p>
+<div id="generating-a-data-set" class="section level1">
+<h1>Generating a Data Set</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co">#Number of rows to be generated</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">1000000</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#creating dataset</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">data.frame</span>( </span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="at">Var_1 =</span> <span class="fu">round</span>(<span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">50</span>, <span class="at">sd =</span> <span class="dv">10</span>)), </span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="at">Var_2 =</span> <span class="fu">round</span>(<span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="fl">7.5</span>, <span class="at">sd =</span> <span class="fl">2.1</span>)), </span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="at">Var_3 =</span> <span class="fu">as.factor</span>(<span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&quot;0&quot;</span>, <span class="st">&quot;1&quot;</span>), n, <span class="at">replace =</span> <span class="cn">TRUE</span>)), </span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="at">Var_4 =</span> <span class="fu">as.factor</span>(<span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&quot;0&quot;</span>, <span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>), n, <span class="at">replace =</span> <span class="cn">TRUE</span>)), </span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="at">Var_5 =</span> <span class="fu">as.factor</span>(<span class="fu">sample</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">15</span>, n, <span class="at">replace =</span> <span class="cn">TRUE</span>)), </span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="at">Var_6 =</span> <span class="fu">round</span>(<span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">60</span>, <span class="at">sd =</span> <span class="dv">5</span>))</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>)</span></code></pre></div>
+<p>This data set contains six variables of which four of them are
+continuous generated from normal distribution and two of them are
+catagorial and other one is count variable. Now we shall fit different
+GLMs with this data set below.</p>
+</div>
+<div id="fitting-multiple-linear-regression-model" class="section level1">
+<h1>Fitting Multiple Linear Regression Model</h1>
+<p>Now, we shall fit multiple linear regression model to the data sets
+assuming Var_1 as response variable and all other variables as
+independent ones.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>nmodel<span class="ot">=</span> drglm<span class="sc">::</span><span class="fu">drglm</span>(Var_1 <span class="sc">~</span> Var_2<span class="sc">+</span> Var_3<span class="sc">+</span> Var_4<span class="sc">+</span> Var_5<span class="sc">+</span> Var_6,  </span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>                     <span class="at">data=</span>dataset, <span class="at">family=</span><span class="st">&quot;gaussian&quot;</span>, </span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>                     <span class="at">fitfunction=</span><span class="st">&quot;speedglm&quot;</span>, <span class="at">k=</span><span class="dv">10</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#Output</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">print</span>(nmodel)</span></code></pre></div>
+<pre><code>##                  Estimate standard.error      Z_value  Pr...z..
+## (Intercept) 49.9938921629    0.132222414 378.10451704 0.0000000
+## Var_2       -0.0045648136    0.004721587  -0.96679652 0.3336458
+## Var_31       0.0140777358    0.020007935   0.70360764 0.4816772
+## Var_41      -0.0070996373    0.024495862  -0.28983006 0.7719462
+## Var_42       0.0031706649    0.024509469   0.12936490 0.8970689
+## Var_51      -0.0572865412    0.056620740  -1.01175896 0.3116533
+## Var_52      -0.0110496857    0.056615948  -0.19516914 0.8452605
+## Var_53      -0.0448607620    0.056694044  -0.79127821 0.4287817
+## Var_54      -0.0268086198    0.056646008  -0.47326582 0.6360235
+## Var_55       0.0466234380    0.056633526   0.82324801 0.4103670
+## Var_56      -0.0270480470    0.056580123  -0.47804857 0.6326156
+## Var_57       0.0433609651    0.056668648   0.76516675 0.4441723
+## Var_58      -0.0297390739    0.056712763  -0.52438062 0.6000138
+## Var_59       0.0432931453    0.056669237   0.76396203 0.4448899
+## Var_510      0.0672852618    0.056660012   1.18752643 0.2350200
+## Var_511     -0.0583903308    0.056635285  -1.03098856 0.3025462
+## Var_512      0.0091184125    0.056623543   0.16103571 0.8720653
+## Var_513      0.0049039721    0.056698929   0.08649144 0.9310758
+## Var_514     -0.0151239426    0.056584592  -0.26728023 0.7892534
+## Var_515      0.0548865463    0.056635643   0.96911668 0.3324870
+## Var_6        0.0004866552    0.001996329   0.24377510 0.8074050
+##                     normal.CI
+## (Intercept) [ 49.73 , 50.25 ]
+## Var_2           [ -0.01 , 0 ]
+## Var_31       [ -0.03 , 0.05 ]
+## Var_41       [ -0.06 , 0.04 ]
+## Var_42       [ -0.04 , 0.05 ]
+## Var_51       [ -0.17 , 0.05 ]
+## Var_52        [ -0.12 , 0.1 ]
+## Var_53       [ -0.16 , 0.07 ]
+## Var_54       [ -0.14 , 0.08 ]
+## Var_55       [ -0.06 , 0.16 ]
+## Var_56       [ -0.14 , 0.08 ]
+## Var_57       [ -0.07 , 0.15 ]
+## Var_58       [ -0.14 , 0.08 ]
+## Var_59       [ -0.07 , 0.15 ]
+## Var_510      [ -0.04 , 0.18 ]
+## Var_511      [ -0.17 , 0.05 ]
+## Var_512       [ -0.1 , 0.12 ]
+## Var_513      [ -0.11 , 0.12 ]
+## Var_514       [ -0.13 , 0.1 ]
+## Var_515      [ -0.06 , 0.17 ]
+## Var_6               [ 0 , 0 ]</code></pre>
+</div>
+<div id="fitting-binomial-regression-logistic-regression-model" class="section level1">
+<h1>Fitting Binomial Regression (Logistic Regression) Model</h1>
+<p>Now, we shall fit logistic regression model to the data sets assuming
+Var_3 as response variable and all other variables as independent
+ones.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>bmodel<span class="ot">=</span>drglm<span class="sc">::</span><span class="fu">drglm</span>(Var_3<span class="sc">~</span> Var_1<span class="sc">+</span> Var_2<span class="sc">+</span> Var_4<span class="sc">+</span> Var_5<span class="sc">+</span> Var_6, </span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>                    <span class="at">data=</span>dataset, <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                    <span class="at">fitfunction=</span><span class="st">&quot;speedglm&quot;</span>, <span class="at">k=</span><span class="dv">10</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#Output</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="fu">print</span>(bmodel)</span></code></pre></div>
+<pre><code>##                  Estimate Odds.Ratio standard.error    t.value   Pr...z..
+## (Intercept)  0.0498850493  1.0511503   0.0281923787  1.7694516 0.07681854
+## Var_1        0.0001406428  1.0001407   0.0001999858  0.7032641 0.48189121
+## Var_2       -0.0010289335  0.9989716   0.0009441471 -1.0898021 0.27580035
+## Var_41      -0.0009157951  0.9990846   0.0048982015 -0.1869656 0.85168762
+## Var_42       0.0008660010  1.0008664   0.0049009500  0.1767006 0.85974354
+## Var_51      -0.0090198819  0.9910207   0.0113218905 -0.7966763 0.42563905
+## Var_52      -0.0103609021  0.9896926   0.0113209121 -0.9152003 0.36008649
+## Var_53      -0.0111773346  0.9888849   0.0113364057 -0.9859681 0.32414876
+## Var_54      -0.0051583819  0.9948549   0.0113269975 -0.4554059 0.64881723
+## Var_55      -0.0166414412  0.9834963   0.0113247263 -1.4694784 0.14170306
+## Var_56      -0.0170752441  0.9830697   0.0113137869 -1.5092422 0.13123691
+## Var_57      -0.0115591956  0.9885074   0.0113313552 -1.0201071 0.30767768
+## Var_58      -0.0190175646  0.9811621   0.0113399851 -1.6770361 0.09353542
+## Var_59      -0.0024879742  0.9975151   0.0113313423 -0.2195657 0.82620940
+## Var_510     -0.0039725724  0.9960353   0.0113297226 -0.3506328 0.72586385
+## Var_511     -0.0189525009  0.9812260   0.0113250085 -1.6735088 0.09422718
+## Var_512     -0.0080661323  0.9919663   0.0113222078 -0.7124169 0.47620665
+## Var_513     -0.0167293199  0.9834098   0.0113376220 -1.4755581 0.14006256
+## Var_514     -0.0270868122  0.9732767   0.0113146115 -2.3939675 0.01666723
+## Var_515     -0.0148850714  0.9852252   0.0113248937 -1.3143674 0.18872258
+## Var_6       -0.0006315246  0.9993687   0.0003991918 -1.5820079 0.11364778
+##                    normal.CI
+## (Intercept) [ -0.01 , 0.11 ]
+## Var_1              [ 0 , 0 ]
+## Var_2              [ 0 , 0 ]
+## Var_41      [ -0.01 , 0.01 ]
+## Var_42      [ -0.01 , 0.01 ]
+## Var_51      [ -0.03 , 0.01 ]
+## Var_52      [ -0.03 , 0.01 ]
+## Var_53      [ -0.03 , 0.01 ]
+## Var_54      [ -0.03 , 0.02 ]
+## Var_55      [ -0.04 , 0.01 ]
+## Var_56      [ -0.04 , 0.01 ]
+## Var_57      [ -0.03 , 0.01 ]
+## Var_58         [ -0.04 , 0 ]
+## Var_59      [ -0.02 , 0.02 ]
+## Var_510     [ -0.03 , 0.02 ]
+## Var_511        [ -0.04 , 0 ]
+## Var_512     [ -0.03 , 0.01 ]
+## Var_513     [ -0.04 , 0.01 ]
+## Var_514        [ -0.05 , 0 ]
+## Var_515     [ -0.04 , 0.01 ]
+## Var_6              [ 0 , 0 ]</code></pre>
+</div>
+<div id="fitting-poisson-regression-model" class="section level1">
+<h1>Fitting Poisson Regression Model</h1>
+<p>Now, we shall fit poisson regression model to the data sets assuming
+Var_5 as response variable and all other variables as independent
+ones.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>pmodel<span class="ot">=</span>drglm<span class="sc">::</span><span class="fu">drglm</span>(Var_5<span class="sc">~</span> Var_1<span class="sc">+</span> Var_2<span class="sc">+</span> Var_3<span class="sc">+</span> Var_4<span class="sc">+</span> Var_6, </span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>                    <span class="at">data=</span>dataset, <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>, </span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>                    <span class="at">fitfunction=</span><span class="st">&quot;speedglm&quot;</span>, <span class="at">k=</span><span class="dv">10</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#Output</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="fu">print</span>(pmodel)</span></code></pre></div>
+<pre><code>##                  Estimate Odds.Ratio standard.error      t.value    Pr...z..
+## (Intercept)  2.544047e+00 12.7310943   0.0562502046 45.227344328 0.000000000
+## Var_1       -3.472601e-06  0.9999965   0.0004138377 -0.008391215 0.993304858
+## Var_2        3.258381e-03  1.0032637   0.0019538879  1.667639724 0.095387268
+## Var_31      -1.273949e-02  0.9873413   0.0082797401 -1.538634126 0.123893642
+## Var_41      -3.959107e-03  0.9960487   0.0101398385 -0.390450669 0.696203326
+## Var_42      -2.863191e-03  0.9971409   0.0101476530 -0.282153069 0.777826142
+## Var_6        2.539528e-03  1.0025428   0.0008261139  3.074064806 0.002111636
+##                    normal.CI
+## (Intercept)  [ 2.43 , 2.65 ]
+## Var_1              [ 0 , 0 ]
+## Var_2           [ 0 , 0.01 ]
+## Var_31         [ -0.03 , 0 ]
+## Var_41      [ -0.02 , 0.02 ]
+## Var_42      [ -0.02 , 0.02 ]
+## Var_6              [ 0 , 0 ]</code></pre>
+</div>
+<div id="fitting-multinomial-logistic-regression-model" class="section level1">
+<h1>Fitting Multinomial Logistic Regression Model</h1>
+<p>Now, we shall fit multinomial logistic regression model to the data
+sets assuming Var_4 as response variable and all other variables as
+independent ones.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>mmodel<span class="ot">=</span>drglm<span class="sc">::</span><span class="fu">drglm</span>(Var_4<span class="sc">~</span> Var_1<span class="sc">+</span> Var_2<span class="sc">+</span> Var_3<span class="sc">+</span> Var_5<span class="sc">+</span> Var_6, </span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>              <span class="at">data=</span>dataset,<span class="at">family=</span><span class="st">&quot;multinomial&quot;</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>              <span class="at">fitfunction=</span><span class="st">&quot;multinom&quot;</span>, <span class="at">k=</span><span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # weights:  63 (40 variable)
+## initial  value 109861.228867 
+## final  value 109861.228162 
+## converged
+## # weights:  63 (40 variable)
+## initial  value 109861.228867 
+## iter  10 value 109842.503510
+## iter  20 value 109840.273128
+## final  value 109838.002508 
+## converged
+## # weights:  63 (40 variable)
+## initial  value 109861.228867 
+## iter  10 value 109850.296686
+## iter  20 value 109846.528490
+## final  value 109842.945823 
+## converged
+## # weights:  63 (40 variable)
+## initial  value 109861.228867 
+## iter  10 value 109847.393856
+## iter  20 value 109841.079169
+## final  value 109840.175418 
+## converged
+## # weights:  63 (40 variable)
+## initial  value 109861.228867 
+## iter  10 value 109842.805655
+## iter  20 value 109840.979230
+## iter  30 value 109838.911934
+## final  value 109838.864166 
+## converged
+## # weights:  63 (40 variable)
+## initial  value 109861.228867 
+## iter  10 value 109841.472994
+## iter  20 value 109839.598647
+## final  value 109837.733262 
+## converged
+## # weights:  63 (40 variable)
+## initial  value 109861.228867 
+## iter  10 value 109851.271296
+## iter  20 value 109846.660324
+## iter  30 value 109839.769091
+## iter  40 value 109838.903624
+## iter  40 value 109838.903182
+## iter  40 value 109838.903178
+## final  value 109838.903178 
+## converged
+## # weights:  63 (40 variable)
+## initial  value 109861.228867 
+## iter  10 value 109840.806578
+## iter  20 value 109837.263429
+## final  value 109834.528438 
+## converged
+## # weights:  63 (40 variable)
+## initial  value 109861.228867 
+## iter  10 value 109850.031314
+## iter  20 value 109849.169972
+## final  value 109846.685488 
+## converged
+## # weights:  63 (40 variable)
+## initial  value 109861.228867 
+## iter  10 value 109848.501910
+## iter  20 value 109846.077070
+## final  value 109845.048526 
+## converged</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co">#Output</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">print</span>(mmodel)</span></code></pre></div>
+<pre><code>##                Estimate.1    Estimate.2 Odds.Ratio.1 Odds.Ratio.2
+## (Intercept)  4.081904e-02  2.071676e-03    1.0416636    1.0020738
+## Var_1       -9.984185e-05  1.415146e-05    0.9999002    1.0000142
+## Var_2        1.402186e-03  2.012445e-04    1.0014032    1.0002013
+## Var_31      -1.835696e-03 -5.230905e-05    0.9981660    0.9999477
+## Var_51      -2.570995e-03  6.045345e-03    0.9974323    1.0060637
+## Var_52       2.589983e-03  7.659461e-03    1.0025933    1.0076889
+## Var_53      -4.951806e-03 -1.604007e-02    0.9950604    0.9840879
+## Var_54       1.456459e-03  1.530690e-02    1.0014575    1.0154247
+## Var_55      -2.225580e-02 -2.838295e-02    0.9779900    0.9720161
+## Var_56      -1.001576e-02 -1.472764e-02    0.9900342    0.9853803
+## Var_57       3.229535e-03 -1.157117e-03    1.0032348    0.9988436
+## Var_58       2.181392e-05 -1.234939e-03    1.0000218    0.9987658
+## Var_59      -1.823170e-02 -1.626911e-02    0.9819335    0.9838625
+## Var_510     -1.050656e-02 -1.295762e-02    0.9895484    0.9871260
+## Var_511     -1.114918e-02  6.444328e-03    0.9889127    1.0064651
+## Var_512     -5.482693e-03  1.265131e-03    0.9945323    1.0012659
+## Var_513     -1.979504e-02 -2.113650e-02    0.9803996    0.9790853
+## Var_514     -3.300604e-02 -1.611510e-02    0.9675327    0.9840141
+## Var_515     -8.855361e-03  3.537469e-03    0.9911837    1.0035437
+## Var_6       -6.124825e-04 -1.379973e-05    0.9993877    0.9999862
+##             standard.error.1 standard.error.2    Z_value.1   Z_value.2
+## (Intercept)     0.0344340641     0.0344561368  1.185426192  0.06012503
+## Var_1           0.0002448509     0.0002449696 -0.407765881  0.05776822
+## Var_2           0.0011559414     0.0011565234  1.213025485  0.17400812
+## Var_31          0.0048983192     0.0049007854 -0.374760305 -0.01067361
+## Var_51          0.0138744940     0.0138774417 -0.185303723  0.43562392
+## Var_52          0.0138717808     0.0138809960  0.186708754  0.55179480
+## Var_53          0.0138678622     0.0139049681 -0.357070594 -1.15354944
+## Var_54          0.0138888131     0.0138830238  0.104865617  1.10256256
+## Var_55          0.0138490644     0.0138778135 -1.607025597 -2.04520340
+## Var_56          0.0138454752     0.0138710823 -0.723395603 -1.06175109
+## Var_57          0.0138747222     0.0139001413  0.232763905 -0.08324495
+## Var_58          0.0138865421     0.0139071506  0.001570868 -0.08879882
+## Var_59          0.0138691698     0.0138837951 -1.314548921 -1.17180582
+## Var_510         0.0138664395     0.0138884550 -0.757696897 -0.93297782
+## Var_511         0.0138833413     0.0138709237 -0.803061741  0.46459254
+## Var_512         0.0138716161     0.0138773671 -0.395245419  0.09116504
+## Var_513         0.0138717368     0.0138919857 -1.427005454 -1.52148900
+## Var_514         0.0138574025     0.0138463110 -2.381834365 -1.16385533
+## Var_515         0.0138783001     0.0138751272 -0.638072450  0.25495039
+## Var_6           0.0004887467     0.0004889809 -1.253169669 -0.02822140
+##             Pr...z...1 Pr...z...2    Lower.CI.1    Lower.CI.2    Upper.CI.1
+## (Intercept) 0.23584898 0.95205606 -0.0266704840 -0.0654611110  0.1083085670
+## Var_1       0.68344556 0.95393325 -0.0005797408 -0.0004659801  0.0003800571
+## Var_2       0.22512008 0.86185908 -0.0008634171 -0.0020654997  0.0036677897
+## Var_31      0.70783874 0.99148386 -0.0114362249 -0.0096576719  0.0077648337
+## Var_51      0.85299082 0.66310961 -0.0297645039 -0.0211539403  0.0246225131
+## Var_52      0.85188899 0.58108895 -0.0245982079 -0.0195467909  0.0297781737
+## Var_53      0.72103896 0.24868494 -0.0321323162 -0.0432933050  0.0222287046
+## Var_54      0.91648244 0.27021717 -0.0257651146 -0.0119033243  0.0286780325
+## Var_55      0.10804875 0.04083481 -0.0493994683 -0.0555829659  0.0048878664
+## Var_56      0.46943687 0.28834870 -0.0371523886 -0.0419144585  0.0171208768
+## Var_57      0.81594474 0.93365677 -0.0239644213 -0.0284008929  0.0304234903
+## Var_58      0.99874663 0.92924180 -0.0271953084 -0.0284924528  0.0272389363
+## Var_59      0.18866155 0.24127502 -0.0454147755 -0.0434808504  0.0089513711
+## Var_510     0.44863246 0.35083142 -0.0376842803 -0.0401784920  0.0166711639
+## Var_511     0.42193905 0.64222327 -0.0383600292 -0.0207421833  0.0160616687
+## Var_512     0.69266178 0.92736145 -0.0326705607 -0.0259340090  0.0217051753
+## Var_513     0.15357832 0.12813717 -0.0469831484 -0.0483642950  0.0073930604
+## Var_514     0.01722664 0.24448265 -0.0601660472 -0.0432533737 -0.0058460277
+## Var_515     0.52342652 0.79876141 -0.0360563293 -0.0236572804  0.0183456074
+## Var_6       0.21014397 0.97748557 -0.0015704084 -0.0009721847  0.0003454434
+##                Upper.CI.2
+## (Intercept)  0.0696044634
+## Var_1        0.0004942831
+## Var_2        0.0024679886
+## Var_31       0.0095530538
+## Var_51       0.0332446313
+## Var_52       0.0348657137
+## Var_53       0.0112131685
+## Var_54       0.0425171290
+## Var_55      -0.0011829367
+## Var_56       0.0124591850
+## Var_57       0.0260866597
+## Var_58       0.0260225757
+## Var_59       0.0109426265
+## Var_510      0.0142632510
+## Var_511      0.0336308387
+## Var_512      0.0284642705
+## Var_513      0.0060912882
+## Var_514      0.0110231681
+## Var_515      0.0307322187
+## Var_6        0.0009445853</code></pre>
+<p>Note that, function ‘drglm’ is designed for fitting GLMs to data sets
+which can be fitted into memory. To fit data set that is larger than the
+memory, function ‘big.drglm’ can be used. Users are requested to check
+the respective vignette.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
