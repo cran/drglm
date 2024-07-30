@@ -35,7 +35,7 @@
 #' pred_2 = round(rnorm(n, mean = 7.5, sd = 2.1)),
 #' pred_3 = as.factor(sample(c("0", "1"), n, replace = TRUE)),
 #' pred_4 = as.factor(sample(c("0", "1", "2"), n, replace = TRUE)),
-#' pred_5 = as.factor(sample(0:15, n, replace = TRUE)),
+#' pred_5 = sample(0:15, n, replace = TRUE),
 #' pred_6 = round(rnorm(n, mean = 60, sd = 5)))
 #' #fitting MLRM
 #' nmodel= drglm::drglm(pred_1 ~ pred_2+ pred_3+ pred_4+ pred_5+ pred_6,
@@ -49,7 +49,7 @@
 #' bmodel
 #' #fitting poisson regression model
 #' pmodel=drglm::drglm(pred_5~ pred_1+ pred_2+ pred_3+ pred_4+ pred_6,
-#' data=dataset, family="binomial", fitfunction="speedglm", k=10)
+#' data=dataset, family="poisson", fitfunction="speedglm", k=10)
 #' #Output
 #' pmodel
 #' #fitting multinomial logistic regression model
@@ -135,7 +135,12 @@ drglm<-function(formula,family,data,k,fitfunction)
     p_value=2*(1- pnorm(abs(Z)))
 
     # creating a data frame with four columns
-    table <- data.frame("Estimate"=B,"standard.error"=se_com , "t_value"= Z, "Pr(>|z|)"=p_value,"normal.CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"))
+    table <- data.frame("Estimate"=B,
+                        "standard error"=se_com ,
+                        "t value"= Z,
+                        "Pr(>|t|)"=p_value,
+                        "95% CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"),
+                        check.names = FALSE)
 
     # viewtable
     table
@@ -217,7 +222,12 @@ drglm<-function(formula,family,data,k,fitfunction)
     p_value=2*(1- pnorm(abs(Z)))
 
     # creating a data frame with four columns
-    table <- data.frame("Estimate"=B,"standard.error"=se_com , "Z_value"= Z, "Pr(>|z|)"=p_value,"normal.CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"))
+    table <- data.frame("Estimate"=B,
+                        "standard error"=se_com ,
+                        "t value"= Z,
+                        "Pr(>|t|)"=p_value,
+                        "95% CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"),
+                        check.names = FALSE)
 
     # viewtable
     table
@@ -300,7 +310,13 @@ drglm<-function(formula,family,data,k,fitfunction)
     p_value=2*(1- pnorm(abs(Z)))
 
     # creating a data frame with four columns
-    table <- data.frame("Estimate"=B,"Odds Ratio"=OR, "standard error"=se_com , "t value"= Z, "Pr(>|z|)"=p_value,"normal CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"))
+    table <- data.frame("Estimate"=B,
+                        "Odds Ratio"=OR,
+                        "standard error"=se_com ,
+                        "z value"= Z,
+                        "Pr(>|z|)"=p_value,
+                        "95% CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"),
+                        check.names = FALSE)
 
     table
 
@@ -378,7 +394,13 @@ drglm<-function(formula,family,data,k,fitfunction)
 
     p_value=2*(1- pnorm(abs(Z)))
 
-    table <- data.frame("Estimate"=B,"Odds Ratio"=OR,"standard.error"=se_com , "t value"= Z, "Pr(>|z|)"=p_value,"normal.CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"))
+    table <- data.frame("Estimate"=B,
+                        "Odds Ratio"=OR,
+                        "standard error"=se_com ,
+                        "z value"= Z,
+                        "Pr(>|z|)"=p_value,
+                        "95% CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"),
+                        check.names = FALSE)
 
     table
   }
@@ -437,7 +459,13 @@ drglm<-function(formula,family,data,k,fitfunction)
 
     p_value=2*(1- pnorm(abs(Z)))
 
-    table <- data.frame("Estimate"=B,"Odds Ratio"=OR,"standard error"=se_com , "Z value"= Z, "Pr(>|z|)"=p_value,"normal.CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"))
+    table <- data.frame("Estimate"=B,
+                        "Odds Ratio"=OR,
+                        "standard error"=se_com ,
+                        "z value"= Z,
+                        "Pr(>|z|)"=p_value,
+                        "95% CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"),
+                        check.names = FALSE)
 
     table
   }
@@ -496,7 +524,13 @@ drglm<-function(formula,family,data,k,fitfunction)
 
     p_value=2*(1- pnorm(abs(Z)))
 
-    table <- data.frame("Estimate"=B,"Odds Ratio"=OR,"standard error"=se_com , "Z value"= Z, "Pr(>|z|)"=p_value,"normal.CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"))
+    table <- data.frame("Estimate"=B,
+                        "Odds Ratio"=OR,
+                        "standard error"=se_com ,
+                        "z value"= Z,
+                        "Pr(>|z|)"=p_value,
+                        "95% CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"),
+                        check.names = FALSE)
 
     table
   }
@@ -565,7 +599,14 @@ drglm<-function(formula,family,data,k,fitfunction)
 
     p_value=2*(1- pnorm(abs(Z)))
 
-    table <- data.frame("Estimate"=t(B),"Odds Ratio"=t(OR), "standard.error"=t(se_com) , "Z_value"= t(Z), "Pr(>|z|)"=t(p_value),"Lower.CI"=t(l_normal),"Upper.CI" = t(u_normal ))
+    table <- data.frame("Estimate"=t(B),
+                        "Odds Ratio"=t(OR),
+                        "standard error"=t(se_com) ,
+                        "z value"= t(Z),
+                        "Pr(>|z|)"=t(p_value),
+                        "95% lower CI"=t(l_normal),
+                        "95% upper CI" = t(u_normal ),
+                        check.names = FALSE)
 
     # viewtable
     table

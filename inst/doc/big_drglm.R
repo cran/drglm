@@ -44,7 +44,7 @@ print(nmodel)
 
 ## -----------------------------------------------------------------------------
 # Fitting Logistic Model
-bmodel <- drglm::big.drglm(da,formula = factor(Var_3) ~ Var_1+ Var_2+
+bmodel <- drglm::big.drglm(da,formula = Var_3 ~ Var_1+ Var_2+
                              factor(Var_4)+ factor(Var_5)+ Var_6, 
                            10, family="binomial")
 # View the results table

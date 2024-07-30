@@ -99,7 +99,13 @@ drglm.multinom<-function(formula,data,k)
 
   p_value=2*(1- stats::pnorm(abs(Z)))
 
-  table <- data.frame("Estimate"=t(B),"standard.error"=t(se_com) , "Z_value"= t(Z), "Pr(>|z|)"=t(p_value),"Lower.CI"=t(l_normal),"Upper.CI" = t(u_normal ))
+  table <- data.frame("Estimate"=t(B),
+                      "standard error"=t(se_com) ,
+                      "z value"= t(Z),
+                      "Pr(>|z|)"=t(p_value),
+                      "95% lower CI"=t(l_normal),
+                      "95% upper CI" = t(u_normal ),
+                      check.names = FALSE)
 
   # viewtable
   table

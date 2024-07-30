@@ -370,7 +370,7 @@ fitting.</p>
 <span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co"># Path to the temporary file</span></span>
 <span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>dataset_path <span class="ot">&lt;-</span> temp_file</span>
 <span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>dataset_path  <span class="co"># Display the path to the temporary file</span></span></code></pre></div>
-<pre><code>## [1] &quot;C:\\Users\\mhnay\\AppData\\Local\\Temp\\Rtmp2JrL98\\file681c218a3e50.csv&quot;</code></pre>
+<pre><code>## [1] &quot;C:\\Users\\mhnay\\AppData\\Local\\Temp\\RtmpAvJhIN\\file2a0447547431.csv&quot;</code></pre>
 <p>We’ve saved the data set to disk, assuming the data set is too large
 to fit into memory. We’ll explore how to handle such data sets. The
 ‘drglm’ package offers a function called ‘make.data’, which is a slight
@@ -379,7 +379,7 @@ designed for large CSV files that can’t be loaded into memory.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Path to the temporary file</span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>dataset_path <span class="ot">&lt;-</span> temp_file</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>dataset_path  <span class="co"># Display the path to the temporary file</span></span></code></pre></div>
-<pre><code>## [1] &quot;C:\\Users\\mhnay\\AppData\\Local\\Temp\\Rtmp2JrL98\\file681c218a3e50.csv&quot;</code></pre>
+<pre><code>## [1] &quot;C:\\Users\\mhnay\\AppData\\Local\\Temp\\RtmpAvJhIN\\file2a0447547431.csv&quot;</code></pre>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Initialize the data reading function with the data set path and chunk size</span></span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>da <span class="ot">&lt;-</span> drglm<span class="sc">::</span><span class="fu">make.data</span>(dataset_path, <span class="at">chunksize =</span> <span class="dv">100000</span>)</span></code></pre></div>
 <div id="fitting-mlr-models" class="section level1">
@@ -391,7 +391,7 @@ designed for large CSV files that can’t be loaded into memory.</p>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a></span>
 <span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co"># View the results table</span></span>
 <span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="fu">print</span>(nmodel)</span></code></pre></div>
-<pre><code>##                      Estimate standard.error      t_value  Pr...z..
+<pre><code>##                      Estimate standard error      t value  Pr(&gt;|t|)
 ## (Intercept)     49.9938921629    0.132222414 378.10451704 0.0000000
 ## Var_2           -0.0045648136    0.004721587  -0.96679652 0.3336458
 ## factor(Var_3)1   0.0140777358    0.020007935   0.70360764 0.4816772
@@ -413,7 +413,7 @@ designed for large CSV files that can’t be loaded into memory.</p>
 ## factor(Var_5)14 -0.0151239426    0.056584592  -0.26728023 0.7892534
 ## factor(Var_5)15  0.0548865463    0.056635643   0.96911668 0.3324870
 ## Var_6            0.0004866552    0.001996329   0.24377510 0.8074050
-##                         normal.CI
+##                            95% CI
 ## (Intercept)     [ 49.73 , 50.25 ]
 ## Var_2               [ -0.01 , 0 ]
 ## factor(Var_3)1   [ -0.03 , 0.05 ]
@@ -441,12 +441,12 @@ above data set.</p>
 <div id="fitting-logistic-regression-model" class="section level1">
 <h1>Fitting logistic Regression Model</h1>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Fitting Logistic Model</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>bmodel <span class="ot">&lt;-</span> drglm<span class="sc">::</span><span class="fu">big.drglm</span>(da,<span class="at">formula =</span> <span class="fu">factor</span>(Var_3) <span class="sc">~</span> Var_1<span class="sc">+</span> Var_2<span class="sc">+</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>bmodel <span class="ot">&lt;-</span> drglm<span class="sc">::</span><span class="fu">big.drglm</span>(da,<span class="at">formula =</span> Var_3 <span class="sc">~</span> Var_1<span class="sc">+</span> Var_2<span class="sc">+</span></span>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>                             <span class="fu">factor</span>(Var_4)<span class="sc">+</span> <span class="fu">factor</span>(Var_5)<span class="sc">+</span> Var_6, </span>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>                           <span class="dv">10</span>, <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>)</span>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co"># View the results table</span></span>
 <span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="fu">print</span>(bmodel)</span></code></pre></div>
-<pre><code>##                      Estimate Odds.Ratio standard.error    t.value   Pr...z..
+<pre><code>##                      Estimate Odds Ratio standard error    z value   Pr(&gt;|z|)
 ## (Intercept)      0.0498850493  1.0511503   0.0281923787  1.7694516 0.07681854
 ## Var_1            0.0001406428  1.0001407   0.0001999858  0.7032641 0.48189121
 ## Var_2           -0.0010289335  0.9989716   0.0009441471 -1.0898021 0.27580035
@@ -468,7 +468,7 @@ above data set.</p>
 ## factor(Var_5)14 -0.0270868122  0.9732767   0.0113146115 -2.3939675 0.01666723
 ## factor(Var_5)15 -0.0148850714  0.9852252   0.0113248937 -1.3143674 0.18872258
 ## Var_6           -0.0006315246  0.9993687   0.0003991918 -1.5820079 0.11364778
-##                        normal.CI
+##                           95% CI
 ## (Intercept)     [ -0.01 , 0.11 ]
 ## Var_1                  [ 0 , 0 ]
 ## Var_2                  [ 0 , 0 ]
@@ -499,7 +499,7 @@ above data set.</p>
 <span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>                             <span class="fu">factor</span>(Var_4)<span class="sc">+</span> Var_6, <span class="dv">10</span>, <span class="at">family=</span><span class="st">&quot;poisson&quot;</span>)</span>
 <span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co"># View the results table</span></span>
 <span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="fu">print</span>(pmodel)</span></code></pre></div>
-<pre><code>##                     Estimate Odds.Ratio standard.error       Z_value   Pr...z..
+<pre><code>##                     Estimate Odds Ratio standard error       z value   Pr(&gt;|z|)
 ## (Intercept)     1.993906e+00  7.3441637              1  1.993906e+00 0.04616233
 ## Var_1           8.520103e-05  1.0000852              1  8.520103e-05 0.99993202
 ## Var_2           5.068223e-04  1.0005070              1  5.068223e-04 0.99959561
@@ -507,7 +507,7 @@ above data set.</p>
 ## factor(Var_4)1 -2.984466e-03  0.9970200              1 -2.984466e-03 0.99761874
 ## factor(Var_4)2 -2.436860e-03  0.9975661              1 -2.436860e-03 0.99805567
 ## Var_6           2.669898e-04  1.0002670              1  2.669898e-04 0.99978697
-##                       normal.CI
+##                          95% CI
 ## (Intercept)     [ 0.03 , 3.95 ]
 ## Var_1          [ -1.96 , 1.96 ]
 ## Var_2          [ -1.96 , 1.96 ]

@@ -120,10 +120,11 @@ big.drglm <- function(data.generator, formula, chunks, family)
     # Create a data frame with the results
     table <- data.frame(
       "Estimate" = B,
-      "standard.error" = se_com,
-      "t_value" = Z,
-      "Pr(>|z|)" = p_value,
-      "normal.CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]")
+      "standard error" = se_com,
+      "t value" = Z,
+      "Pr(>|t|)" = p_value,
+      "95% CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"),
+      check.names = FALSE
     )
 
     # Return the results table
@@ -181,7 +182,13 @@ big.drglm <- function(data.generator, formula, chunks, family)
 
     p_value=2*(1- pnorm(abs(Z)))
 
-    table <- data.frame("Estimate"=B,"Odds Ratio"=OR,"standard.error"=se_com , "t value"= Z, "Pr(>|z|)"=p_value,"normal.CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"))
+    table <- data.frame("Estimate"=B,
+                        "Odds Ratio"=OR,
+                        "standard error"=se_com ,
+                        "z value"= Z,
+                        "Pr(>|z|)"= p_value,
+                        "95% CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"),
+                        check.names = FALSE)
 
     # Return the results table
     return(table)
@@ -228,10 +235,11 @@ big.drglm <- function(data.generator, formula, chunks, family)
     table <- data.frame(
       "Estimate" = B,
       "Odds Ratio" = OR,
-      "standard.error" = se_com,
-      "Z_value" = Z,
+      "standard error" = se_com,
+      "z value" = Z,
       "Pr(>|z|)" = p_value,
-      "normal.CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]")
+      "95% CI" = paste("[", round(l_normal, 2), ",", round(u_normal, 2), "]"),
+      check.names = FALSE
     )
 
     # Return the results table

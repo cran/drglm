@@ -25,7 +25,7 @@ Var_1 = round(rnorm(n, mean = 50, sd = 10)),
 Var_2 = round(rnorm(n, mean = 7.5, sd = 2.1)), 
 Var_3 = as.factor(sample(c("0", "1"), n, replace = TRUE)), 
 Var_4 = as.factor(sample(c("0", "1", "2"), n, replace = TRUE)), 
-Var_5 = as.factor(sample(0:15, n, replace = TRUE)), 
+Var_5 = sample(0:6, n, replace = TRUE), 
 Var_6 = round(rnorm(n, mean = 60, sd = 5))
 )
 
@@ -66,7 +66,7 @@ Now, we shall fit poisson regression model to the data sets assuming Var_5 as re
 ```{r}
 
 pmodel=drglm::drglm(Var_5~ Var_1+ Var_2+ Var_3+ Var_4+ Var_6, 
-                    data=dataset, family="binomial", 
+                    data=dataset, family="poisson", 
                     fitfunction="speedglm", k=10)
 
 #Output
@@ -84,5 +84,6 @@ mmodel=drglm::drglm(Var_4~ Var_1+ Var_2+ Var_3+ Var_5+ Var_6,
 #Output
 print(mmodel)
 ```
+In fitting of four models, we used fitfunction= "speedglm" as fitting function for smaller computation time. In fitfunction= "glm" can also be used which will provide the exact same result as yielded by fitfunction="speedglm".
 
 Note that, function 'drglm' is designed for fitting GLMs to data sets which can be fitted into memory. To fit data set that is larger than the memory, function 'big.drglm' can be used. Users are requested to check the respective vignette. 
